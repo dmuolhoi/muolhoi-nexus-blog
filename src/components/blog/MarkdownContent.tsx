@@ -1,6 +1,6 @@
 
 import React from "react";
-import Markdown from "react-markdown";
+import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import { cn } from "@/lib/utils";
 
@@ -12,7 +12,7 @@ interface MarkdownContentProps {
 const MarkdownContent = ({ content, className }: MarkdownContentProps) => {
   return (
     <div className={cn("prose prose-sm sm:prose max-w-none", className)}>
-      <Markdown rehypePlugins={[rehypeRaw]}>{content}</Markdown>
+      <ReactMarkdown rehypePlugins={[rehypeRaw]}>{content}</ReactMarkdown>
     </div>
   );
 };
