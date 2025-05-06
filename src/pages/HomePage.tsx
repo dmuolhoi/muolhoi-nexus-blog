@@ -2,9 +2,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Lock } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const HomePage = () => {
+  const { user } = useAuth();
+
   return (
     <div className="space-y-10 py-4 animate-fade-in">
       <section className="space-y-4">
@@ -22,6 +25,14 @@ const HomePage = () => {
           <Button asChild variant="outline" className="rounded-full">
             <Link to="/services">View Services</Link>
           </Button>
+          {!user && (
+            <Button asChild variant="outline" size="sm" className="ml-auto">
+              <Link to="/login">
+                <Lock className="mr-2 h-4 w-4" />
+                Admin Login
+              </Link>
+            </Button>
+          )}
         </div>
       </section>
 

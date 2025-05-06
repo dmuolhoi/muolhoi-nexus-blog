@@ -1,24 +1,26 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
+import { Loader2 } from "lucide-react";
 import { Page } from "@/lib/supabase";
 import { updatePage } from "@/lib/api";
-import { Loader2, Save } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MarkdownContent from "../blog/MarkdownContent";
 
 interface PageFormProps {
   page: Page;
 }
 
-const PageForm = ({ page }: PageFormProps) => {
+const PageForm: React.FC<PageFormProps> = ({ page }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [previewMode, setPreviewMode] = useState(false);
+  
   const [content, setContent] = useState(page.content);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,74 +28,98 @@ const PageForm = ({ page }: PageFormProps) => {
     setIsSubmitting(true);
     
     try {
-      if (!content) {
-        throw new Error("Content is required");
-      }
-      
       await updatePage(page.id, { content });
       
       toast({
-        title: "Page updated",
-        description: "The page has been updated successfully"
+        title: "Page Updated",
+        description: `${page.title} page has been updated successfully.`,
       });
       
-      navigate("/admin");
-      
+      setIsSubmitting(false);
     } catch (error: any) {
+      console.error("Error updating page:", error);
       toast({
-        title: "Error",
-        description: error.message || "Something went wrong",
-        variant: "destructive"
+        title: "Error Updating Page",
+        description: error.message || "There was an error updating the page.",
+        variant: "destructive",
       });
-    } finally {
       setIsSubmitting(false);
     }
   };
-  
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-4">
-        <div>
-          <h2 className="text-xl font-semibold mb-2">{page.title}</h2>
-          <p className="text-sm text-dm-gray500 mb-4">Editing page content</p>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold">Edit {page.title} Page</h1>
+          <p className="text-sm text-dm-gray500">
+            Update the content of this static page
+          </p>
         </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="content">Content (Markdown with HTML support)</Label>
-          <Tabs defaultValue="edit">
-            <TabsList className="mb-2">
-              <TabsTrigger value="edit">Edit</TabsTrigger>
-              <TabsTrigger value="preview">Preview</TabsTrigger>
-            </TabsList>
-            <TabsContent value="edit" className="mt-0">
-              <Textarea
-                id="content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Write your content in markdown format..."
-                rows={15}
-                required
-                className="font-mono text-sm"
-              />
-            </TabsContent>
-            <TabsContent value="preview" className="mt-0 border rounded-md p-4 min-h-[300px]">
-              <MarkdownContent content={content} />
-            </TabsContent>
-          </Tabs>
-        </div>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setPreviewMode(!previewMode)}
+        >
+          {previewMode ? "Edit Mode" : "Preview Mode"}
+        </Button>
       </div>
 
-      <div className="flex items-center space-x-2">
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          <Save className="mr-2 h-4 w-4" />
-          Save Changes
-        </Button>
-        <Button type="button" variant="outline" onClick={() => navigate("/admin")}>
-          Cancel
-        </Button>
-      </div>
-    </form>
+      {previewMode ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>{page.title}</CardTitle>
+            <p className="text-sm text-dm-gray500">Preview Mode</p>
+          </CardHeader>
+          <CardContent>
+            <MarkdownContent content={content} />
+          </CardContent>
+          <CardFooter>
+            <Button onClick={() => setPreviewMode(false)}>Back to Edit Mode</Button>
+          </CardFooter>
+        </Card>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>{page.title} Content</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="content">Content (Markdown)</Label>
+                <Textarea
+                  id="content"
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="Write your page content here..."
+                  rows={20}
+                  required
+                />
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate("/admin")}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  "Update Page"
+                )}
+              </Button>
+            </CardFooter>
+          </Card>
+        </form>
+      )}
+    </div>
   );
 };
 
