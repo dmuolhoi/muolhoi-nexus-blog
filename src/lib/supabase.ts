@@ -1,13 +1,5 @@
 
-import { createClient } from '@supabase/supabase-js';
-import { Database } from '@/types/supabase';
-
-// These are placeholders - the user will need to replace with their Supabase credentials
-// DO NOT put your actual Supabase credentials here
-const supabaseUrl = 'https://your-supabase-url.supabase.co';
-const supabaseAnonKey = 'your-supabase-anon-key';
-
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+import { supabase } from '@/integrations/supabase/client';
 
 export type Post = {
   id: string;
@@ -28,3 +20,5 @@ export type Page = {
   content: string;
   updated_at: string;
 };
+
+export { supabase };
