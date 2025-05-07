@@ -2,12 +2,12 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Home, BookOpen, SquareStack, FileText, Shield, User } from "lucide-react";
+import { Home, BookOpen, SquareStack, FileText, Shield, User, LogIn } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const BottomNavBar = () => {
   const location = useLocation();
-  const { isAdmin } = useAuth();
+  const { user, isAdmin } = useAuth();
   
   const isActive = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(`${path}/`);
@@ -41,6 +41,15 @@ const BottomNavBar = () => {
     }
   ];
 
+  // Add login link if user is not logged in
+  if (!user) {
+    navItems.push({
+      name: "Login",
+      path: "/login",
+      icon: <LogIn className="h-5 w-5" />,
+    });
+  }
+  
   // Add admin link if user is admin
   if (isAdmin) {
     navItems.push({

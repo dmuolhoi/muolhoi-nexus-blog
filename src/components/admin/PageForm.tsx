@@ -21,7 +21,7 @@ const PageForm: React.FC<PageFormProps> = ({ page }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
   
-  const [content, setContent] = useState(page.content);
+  const [content, setContent] = useState(page.content || "");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

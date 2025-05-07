@@ -19,13 +19,14 @@ const EditPagePage = () => {
       if (!id) return;
       
       try {
-        // In a real app, you'd fetch by ID instead of slug
         const data = await getPageBySlug(id);
         
         if (!data) {
           setError("Page not found");
+          console.error("Page not found:", id);
         } else {
           setPage(data);
+          console.log("Page fetched successfully:", data);
         }
       } catch (err: any) {
         setError(err.message || "Failed to fetch page");

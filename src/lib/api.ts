@@ -117,18 +117,22 @@ export async function updatePage(id: string, page: Partial<Page>): Promise<Page>
 
 // Upload an image to Supabase Storage
 export async function uploadImage(file: File, path: string): Promise<string | null> {
+  // Generate a unique filename
   const fileExt = file.name.split('.').pop();
   const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
   const filePath = `${path}/${fileName}`;
 
-  const { error } = await supabase.storage
+  // Upload the file to Supabase Storage
+  const { error: uploadError } = await supabase.storage
     .from('blog-images')
     .upload(filePath, file);
 
-  if (error) {
-    throw error;
+  if (uploadError) {
+    console.error("Error uploading image:", uploadError);
+    throw uploadError;
   }
 
+  // Get the public URL
   const { data } = supabase.storage
     .from('blog-images')
     .getPublicUrl(filePath);
