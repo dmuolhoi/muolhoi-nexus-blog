@@ -6,10 +6,12 @@ import { getPageBySlug } from "@/lib/api";
 import { Page } from "@/lib/supabase";
 import PageForm from "@/components/admin/PageForm";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 const EditPagePage = () => {
   const { id } = useParams<{ id: string }>();
   const { user, isAdmin } = useAuth();
+  const { toast } = useToast();
   const [page, setPage] = useState<Page | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,11 +21,17 @@ const EditPagePage = () => {
       if (!id) return;
       
       try {
+        console.log("Fetching page with slug:", id);
         const data = await getPageBySlug(id);
         
         if (!data) {
           setError("Page not found");
           console.error("Page not found:", id);
+          toast({
+            title: "Error",
+            description: `Page with slug "${id}" not found`,
+            variant: "destructive",
+          });
         } else {
           setPage(data);
           console.log("Page fetched successfully:", data);
@@ -31,13 +39,18 @@ const EditPagePage = () => {
       } catch (err: any) {
         setError(err.message || "Failed to fetch page");
         console.error("Error fetching page:", err);
+        toast({
+          title: "Error",
+          description: err.message || "Failed to fetch page",
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
     };
 
     fetchPage();
-  }, [id]);
+  }, [id, toast]);
 
   // Redirect if not logged in or not admin
   if (!user || !isAdmin) {
@@ -54,9 +67,12 @@ const EditPagePage = () => {
 
   if (error || !page) {
     return (
-      <div className="text-center py-10">
+      <div className="text-center py-10 space-y-4">
         <p className="text-dm-gray700 mb-4">
           {error || "This page could not be found."}
+        </p>
+        <p className="text-dm-gray600 text-sm">
+          Please check the page slug and try again.
         </p>
       </div>
     );

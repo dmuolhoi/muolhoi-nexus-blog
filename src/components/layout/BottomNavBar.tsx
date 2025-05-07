@@ -2,7 +2,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Home, BookOpen, SquareStack, User, LogIn, Menu, Grid } from "lucide-react";
+import { Home, BookOpen, User, LogIn, Grid } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const BottomNavBar = () => {
@@ -13,12 +13,8 @@ const BottomNavBar = () => {
     return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
 
+  // Reorganized nav items as requested
   const navItems = [
-    {
-      name: "Home",
-      path: "/",
-      icon: <Home className="h-5 w-5" />,
-    },
     {
       name: "About",
       path: "/about",
@@ -30,20 +26,15 @@ const BottomNavBar = () => {
       icon: <BookOpen className="h-5 w-5" />,
     },
     {
-      name: "Services",
-      path: "/services",
-      icon: <SquareStack className="h-5 w-5" />,
+      name: "Home",
+      path: "/",
+      icon: <Home className="h-5 w-5" />,
     },
     {
       name: "Projects",
       path: "/projects",
       icon: <Grid className="h-5 w-5" />,
     },
-    {
-      name: "Misc",
-      path: "/misc",
-      icon: <Menu className="h-5 w-5" />,
-    }
   ];
 
   // Add login link if user is not logged in
@@ -83,7 +74,7 @@ const BottomNavBar = () => {
               >
                 <div className={cn(
                   "flex items-center justify-center p-1 mb-1 rounded-full",
-                  active && "bg-dm-primary/10"
+                  active && "bg-dm-gray100"
                 )}>
                   {item.icon}
                 </div>

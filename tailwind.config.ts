@@ -76,13 +76,13 @@ export default {
 					gray700: "#444444",
 					gray800: "#222222",
 					black: "#000000",
-					// New vibrant colors
-					primary: "#8B5CF6", // Vivid purple
-					secondary: "#D946EF", // Magenta
-					accent: "#F97316", // Bright orange
+					// Updated colors with black primary
+					primary: "#000000", // Black primary color
+					secondary: "#333333", // Dark gray secondary
+					accent: "#F97316", // Keeping the orange accent
 					blue: "#0EA5E9", // Ocean blue
 					green: "#10B981", // Emerald
-					subtle: "#F1F0FB", // Soft gray with purple hint
+					subtle: "#F8F8F8", // Light gray with subtle hint
 				}
 			},
 			borderRadius: {

@@ -1,10 +1,10 @@
 
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { LogOut, Search } from "lucide-react";
+import { LogOut, Search, FileText } from "lucide-react";
 
 const PageHeader = () => {
   const location = useLocation();
@@ -16,7 +16,7 @@ const PageHeader = () => {
     if (path === "/") return "DM";
     if (path === "/about") return "About Me";
     if (path === "/projects") return "Projects";
-    if (path === "/misc") return "Resources";
+    if (path === "/legal") return "Legal & Resources";
     if (path === "/admin") return "Admin Dashboard";
     if (path.startsWith("/admin/posts/edit")) return "Edit Post";
     if (path === "/admin/posts/new") return "New Post";
@@ -41,7 +41,7 @@ const PageHeader = () => {
       <div className="container max-w-screen-lg mx-auto">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-dm-primary to-dm-secondary flex items-center justify-center text-white font-bold">
+            <div className="w-8 h-8 rounded-full bg-dm-black flex items-center justify-center text-white font-bold">
               D
             </div>
             <h1 className="text-xl font-bold">{getPageTitle()}</h1>
@@ -49,10 +49,18 @@ const PageHeader = () => {
           
           <div className="flex items-center gap-2">
             {!isAdminPage && (
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <Search className="h-[1.2rem] w-[1.2rem]" />
-                <span className="sr-only">Search</span>
-              </Button>
+              <>
+                <Button asChild variant="ghost" size="sm" className="text-xs">
+                  <Link to="/legal">
+                    <FileText className="h-4 w-4 mr-1" />
+                    <span>Legal</span>
+                  </Link>
+                </Button>
+                <Button variant="ghost" size="icon" className="rounded-full">
+                  <Search className="h-[1.2rem] w-[1.2rem]" />
+                  <span className="sr-only">Search</span>
+                </Button>
+              </>
             )}
             
             {isAdmin && user && isAdminPage && (

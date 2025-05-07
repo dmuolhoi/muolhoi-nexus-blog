@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Image as ImageIcon } from "lucide-react";
 import { Page } from "@/lib/supabase";
 import { updatePage } from "@/lib/api";
 import MarkdownContent from "../blog/MarkdownContent";
@@ -22,6 +22,17 @@ const PageForm: React.FC<PageFormProps> = ({ page }) => {
   const [previewMode, setPreviewMode] = useState(false);
   
   const [content, setContent] = useState(page.content || "");
+  
+  // Helper for image upload markdown syntax
+  const insertImageMarkdown = () => {
+    const imageMarkdown = "![Image description](https://example.com/your-image.jpg)";
+    setContent(prevContent => prevContent + "\n\n" + imageMarkdown);
+    
+    toast({
+      title: "Image Markdown Added",
+      description: "Replace the URL with your actual image URL",
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,13 +67,24 @@ const PageForm: React.FC<PageFormProps> = ({ page }) => {
             Update the content of this static page
           </p>
         </div>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => setPreviewMode(!previewMode)}
-        >
-          {previewMode ? "Edit Mode" : "Preview Mode"}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={insertImageMarkdown}
+            title="Insert Image Markdown"
+          >
+            <ImageIcon className="h-4 w-4 mr-2" />
+            Insert Image
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setPreviewMode(!previewMode)}
+          >
+            {previewMode ? "Edit Mode" : "Preview Mode"}
+          </Button>
+        </div>
       </div>
 
       {previewMode ? (
@@ -83,6 +105,9 @@ const PageForm: React.FC<PageFormProps> = ({ page }) => {
           <Card>
             <CardHeader>
               <CardTitle>{page.title} Content</CardTitle>
+              <p className="text-sm text-dm-gray500">
+                Use Markdown for formatting. To add images, use: ![Alt text](image-url.jpg)
+              </p>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -94,6 +119,7 @@ const PageForm: React.FC<PageFormProps> = ({ page }) => {
                   placeholder="Write your page content here..."
                   rows={20}
                   required
+                  className="font-mono"
                 />
               </div>
             </CardContent>
