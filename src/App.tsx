@@ -12,6 +12,9 @@ import PrivateRoute from "@/components/auth/PrivateRoute";
 
 // Public Pages
 import HomePage from "@/pages/HomePage";
+import AboutPage from "@/pages/AboutPage";
+import ProjectsPage from "@/pages/ProjectsPage";
+import MiscPage from "@/pages/MiscPage";
 import BlogPage from "@/pages/BlogPage";
 import BlogPostPage from "@/pages/BlogPostPage";
 import ServicesPage from "@/pages/ServicesPage";
@@ -46,6 +49,9 @@ const App = () => (
             <Route path="/" element={<AppLayout />}>
               {/* Public Routes */}
               <Route index element={<HomePage />} />
+              <Route path="about" element={<AboutPage />} />
+              <Route path="projects" element={<ProjectsPage />} />
+              <Route path="misc" element={<MiscPage />} />
               <Route path="blog" element={<BlogPage />} />
               <Route path="blog/:slug" element={<BlogPostPage />} />
               <Route path="services" element={<ServicesPage />} />

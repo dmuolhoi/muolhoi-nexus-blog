@@ -2,7 +2,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Home, BookOpen, SquareStack, FileText, Shield, User, LogIn } from "lucide-react";
+import { Home, BookOpen, SquareStack, User, LogIn, Menu, Grid } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const BottomNavBar = () => {
@@ -20,6 +20,11 @@ const BottomNavBar = () => {
       icon: <Home className="h-5 w-5" />,
     },
     {
+      name: "About",
+      path: "/about",
+      icon: <User className="h-5 w-5" />,
+    },
+    {
       name: "Blog",
       path: "/blog",
       icon: <BookOpen className="h-5 w-5" />,
@@ -30,14 +35,14 @@ const BottomNavBar = () => {
       icon: <SquareStack className="h-5 w-5" />,
     },
     {
-      name: "Terms",
-      path: "/terms",
-      icon: <FileText className="h-5 w-5" />,
+      name: "Projects",
+      path: "/projects",
+      icon: <Grid className="h-5 w-5" />,
     },
     {
-      name: "Privacy",
-      path: "/privacy",
-      icon: <Shield className="h-5 w-5" />,
+      name: "Misc",
+      path: "/misc",
+      icon: <Menu className="h-5 w-5" />,
     }
   ];
 
@@ -60,23 +65,33 @@ const BottomNavBar = () => {
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 border-t border-dm-gray200 bg-dm-white py-2 px-4 z-10">
-      <div className="flex justify-around items-center">
-        {navItems.map((item) => (
-          <Link
-            key={item.name}
-            to={item.path}
-            className={cn(
-              "flex flex-col items-center p-2 transition-colors",
-              isActive(item.path)
-                ? "text-dm-black"
-                : "text-dm-gray500 hover:text-dm-gray700"
-            )}
-          >
-            {item.icon}
-            <span className="text-xs mt-1">{item.name}</span>
-          </Link>
-        ))}
+    <nav className="fixed bottom-0 left-0 right-0 border-t border-dm-gray200 bg-white py-2 px-4 z-10 shadow-nav">
+      <div className="max-w-screen-lg mx-auto">
+        <div className="flex justify-around items-center">
+          {navItems.map((item) => {
+            const active = isActive(item.path);
+            return (
+              <Link
+                key={item.name}
+                to={item.path}
+                className={cn(
+                  "nav-item transition-all duration-300",
+                  active 
+                    ? "text-dm-primary nav-item-active" 
+                    : "text-dm-gray500 hover:text-dm-gray700"
+                )}
+              >
+                <div className={cn(
+                  "flex items-center justify-center p-1 mb-1 rounded-full",
+                  active && "bg-dm-primary/10"
+                )}>
+                  {item.icon}
+                </div>
+                <span className="text-xs font-medium">{item.name}</span>
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </nav>
   );

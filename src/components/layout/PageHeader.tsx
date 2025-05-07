@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogOut, Search } from "lucide-react";
 
 const PageHeader = () => {
   const location = useLocation();
@@ -14,6 +14,9 @@ const PageHeader = () => {
     const path = location.pathname;
     
     if (path === "/") return "DM";
+    if (path === "/about") return "About Me";
+    if (path === "/projects") return "Projects";
+    if (path === "/misc") return "Resources";
     if (path === "/admin") return "Admin Dashboard";
     if (path.startsWith("/admin/posts/edit")) return "Edit Post";
     if (path === "/admin/posts/new") return "New Post";
@@ -32,23 +35,39 @@ const PageHeader = () => {
   
   return (
     <header className={cn(
-      "py-4 px-4 border-b border-dm-gray200 bg-dm-white z-10",
-      isAdminPage && "sticky top-0"
+      "py-4 px-4 border-b border-dm-gray200 bg-white z-10",
+      isAdminPage && "sticky top-0 shadow-sm"
     )}>
-      <div className="container flex justify-between items-center">
-        <h1 className="text-xl font-bold">{getPageTitle()}</h1>
-        
-        {isAdmin && user && isAdminPage && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => signOut()}
-            className="flex items-center gap-1"
-          >
-            <LogOut className="h-4 w-4" />
-            <span className="sr-only sm:not-sr-only">Logout</span>
-          </Button>
-        )}
+      <div className="container max-w-screen-lg mx-auto">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-dm-primary to-dm-secondary flex items-center justify-center text-white font-bold">
+              D
+            </div>
+            <h1 className="text-xl font-bold">{getPageTitle()}</h1>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            {!isAdminPage && (
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <Search className="h-[1.2rem] w-[1.2rem]" />
+                <span className="sr-only">Search</span>
+              </Button>
+            )}
+            
+            {isAdmin && user && isAdminPage && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => signOut()}
+                className="flex items-center gap-1 rounded-full"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="sr-only sm:not-sr-only">Logout</span>
+              </Button>
+            )}
+          </div>
+        </div>
       </div>
     </header>
   );
