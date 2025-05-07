@@ -20,6 +20,8 @@ import BlogPostPage from "@/pages/BlogPostPage";
 import ServicesPage from "@/pages/ServicesPage";
 import TermsPage from "@/pages/TermsPage";
 import PrivacyPage from "@/pages/PrivacyPage";
+import FAQPage from "@/pages/FAQPage";
+import ResourcesPage from "@/pages/ResourcesPage";
 import LoginPage from "@/pages/admin/LoginPage";
 import NotFound from "@/pages/NotFound";
 
@@ -57,6 +59,8 @@ const App = () => (
               <Route path="services" element={<ServicesPage />} />
               <Route path="terms" element={<TermsPage />} />
               <Route path="privacy" element={<PrivacyPage />} />
+              <Route path="faq" element={<FAQPage />} />
+              <Route path="resources" element={<ResourcesPage />} />
               <Route path="login" element={<LoginPage />} />
               
               {/* Admin Routes */}

@@ -3,7 +3,7 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowRight, FileText, Shield } from "lucide-react";
+import { ArrowRight, FileText, Shield, BookOpen, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const LegalPage = () => {
@@ -60,45 +60,45 @@ const LegalPage = () => {
             <CardContent className="p-6">
               <h2 className="text-2xl font-semibold mb-4">Helpful Resources</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 border rounded-lg hover:bg-dm-subtle transition-colors">
-                  <h3 className="font-semibold">Resource Guide</h3>
-                  <p className="text-sm text-dm-gray600 mt-2">A comprehensive guide to getting started with our services</p>
-                  <Button variant="link" asChild>
-                    <a href="#" className="text-sm flex items-center gap-1 mt-2 hover:underline">
-                      Learn more <ArrowRight className="h-3 w-3" />
-                    </a>
-                  </Button>
-                </div>
+                <Link to="/faq" className="p-4 border rounded-lg hover:bg-dm-subtle transition-colors">
+                  <div className="flex items-center gap-2 mb-2">
+                    <HelpCircle className="h-5 w-5 text-dm-black" />
+                    <h3 className="font-semibold">FAQ</h3>
+                  </div>
+                  <p className="text-sm text-dm-gray600">
+                    Answers to commonly asked questions about our services
+                  </p>
+                </Link>
                 
-                <div className="p-4 border rounded-lg hover:bg-dm-subtle transition-colors">
-                  <h3 className="font-semibold">FAQ</h3>
-                  <p className="text-sm text-dm-gray600 mt-2">Answers to commonly asked questions about our services</p>
-                  <Button variant="link" asChild>
-                    <a href="#" className="text-sm flex items-center gap-1 mt-2 hover:underline">
-                      View FAQ <ArrowRight className="h-3 w-3" />
-                    </a>
-                  </Button>
-                </div>
+                <Link to="/resources" className="p-4 border rounded-lg hover:bg-dm-subtle transition-colors">
+                  <div className="flex items-center gap-2 mb-2">
+                    <FileText className="h-5 w-5 text-dm-black" />
+                    <h3 className="font-semibold">Resource Guide</h3>
+                  </div>
+                  <p className="text-sm text-dm-gray600">
+                    A comprehensive collection of guides and downloadable resources
+                  </p>
+                </Link>
                 
-                <div className="p-4 border rounded-lg hover:bg-dm-subtle transition-colors">
-                  <h3 className="font-semibold">Blog Articles</h3>
-                  <p className="text-sm text-dm-gray600 mt-2">Educational content and insights from our experts</p>
-                  <Button variant="link" asChild>
-                    <Link to="/blog" className="text-sm flex items-center gap-1 mt-2 hover:underline">
-                      Read articles <ArrowRight className="h-3 w-3" />
-                    </Link>
-                  </Button>
-                </div>
+                <Link to="/blog" className="p-4 border rounded-lg hover:bg-dm-subtle transition-colors">
+                  <div className="flex items-center gap-2 mb-2">
+                    <BookOpen className="h-5 w-5 text-dm-black" />
+                    <h3 className="font-semibold">Blog Articles</h3>
+                  </div>
+                  <p className="text-sm text-dm-gray600">
+                    Educational content and insights from our experts
+                  </p>
+                </Link>
                 
-                <div className="p-4 border rounded-lg hover:bg-dm-subtle transition-colors">
-                  <h3 className="font-semibold">Services</h3>
-                  <p className="text-sm text-dm-gray600 mt-2">Learn about the services we offer</p>
-                  <Button variant="link" asChild>
-                    <Link to="/services" className="text-sm flex items-center gap-1 mt-2 hover:underline">
-                      View services <ArrowRight className="h-3 w-3" />
-                    </Link>
-                  </Button>
-                </div>
+                <Link to="/services" className="p-4 border rounded-lg hover:bg-dm-subtle transition-colors">
+                  <div className="flex items-center gap-2 mb-2">
+                    <FileText className="h-5 w-5 text-dm-black" />
+                    <h3 className="font-semibold">Services</h3>
+                  </div>
+                  <p className="text-sm text-dm-gray600">
+                    Learn about the services we offer
+                  </p>
+                </Link>
               </div>
             </CardContent>
           </Card>

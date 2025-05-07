@@ -13,7 +13,7 @@ const BottomNavBar = () => {
     return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
 
-  // Reorganized nav items as requested
+  // Reorganized nav items as requested: about, blog, home, projects, login
   const navItems = [
     {
       name: "About",

@@ -117,6 +117,12 @@ export async function updatePage(id: string, page: Partial<Page>): Promise<Page>
 
 // Upload an image to Supabase Storage
 export async function uploadImage(file: File, path: string): Promise<string | null> {
+  // Check if storage bucket exists, create if not
+  const { data: buckets } = await supabase.storage.listBuckets();
+  if (!buckets?.find(bucket => bucket.name === 'blog-images')) {
+    await supabase.storage.createBucket('blog-images', { public: true });
+  }
+
   // Generate a unique filename
   const fileExt = file.name.split('.').pop();
   const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
@@ -138,4 +144,17 @@ export async function uploadImage(file: File, path: string): Promise<string | nu
     .getPublicUrl(filePath);
 
   return data.publicUrl;
+}
+
+// Search posts
+export async function searchPosts(query: string): Promise<Post[]> {
+  const { data, error } = await supabase
+    .from('posts')
+    .select('*')
+    .eq('published', true)
+    .or(`title.ilike.%${query}%,content.ilike.%${query}%`)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
 }
