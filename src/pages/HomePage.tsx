@@ -1,12 +1,35 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Github, Linkedin, Twitter, FileText, BookOpen, Grid } from "lucide-react";
+import { getPageBySlug } from "@/lib/api";
+import { Page } from "@/lib/supabase";
+import MarkdownContent from "@/components/blog/MarkdownContent";
+import { Loader2 } from "lucide-react";
 
 const HomePage = () => {
-  return (
+  const [page, setPage] = useState<Page | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPage = async () => {
+      try {
+        const data = await getPageBySlug("home");
+        setPage(data);
+      } catch (err) {
+        console.error("Error fetching home page:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPage();
+  }, []);
+
+  // Default content that shows while loading or if no custom content is set
+  const defaultContent = (
     <div className="space-y-12 max-w-4xl mx-auto">
       {/* Hero Section */}
       <section className="text-center space-y-6">
@@ -119,6 +142,24 @@ const HomePage = () => {
           </Link>
         </div>
       </section>
+    </div>
+  );
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-dm-gray500" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="animate-fade-in">
+      {page && page.content ? (
+        <MarkdownContent content={page.content} />
+      ) : (
+        defaultContent
+      )}
     </div>
   );
 };

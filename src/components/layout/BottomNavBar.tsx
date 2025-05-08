@@ -2,7 +2,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Home, BookOpen, User, LogIn, Grid } from "lucide-react";
+import { Home, BookOpen, User, LogIn, Grid, BookText } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const BottomNavBar = () => {
@@ -34,6 +34,11 @@ const BottomNavBar = () => {
       name: "Projects",
       path: "/projects",
       icon: <Grid className="h-5 w-5" />,
+    },
+    {
+      name: "Legal",
+      path: "/legal",
+      icon: <BookText className="h-5 w-5" />,
     },
   ];
 

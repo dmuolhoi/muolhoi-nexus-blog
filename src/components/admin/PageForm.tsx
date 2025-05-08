@@ -1,14 +1,13 @@
-
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2, Image as ImageIcon } from "lucide-react";
+import { Loader2, Image as ImageIcon, Save, Eye, Code, ArrowLeft } from "lucide-react";
 import { Page } from "@/lib/supabase";
-import { updatePage } from "@/lib/api";
+import { updatePage, uploadImage } from "@/lib/api";
 import MarkdownContent from "../blog/MarkdownContent";
 
 interface PageFormProps {
@@ -20,18 +19,104 @@ const PageForm: React.FC<PageFormProps> = ({ page }) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [content, setContent] = useState(page.content || "");
   
-  // Helper for image upload markdown syntax
-  const insertImageMarkdown = () => {
-    const imageMarkdown = "![Image description](https://example.com/your-image.jpg)";
-    setContent(prevContent => prevContent + "\n\n" + imageMarkdown);
+  // Helper for image upload
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
     
-    toast({
-      title: "Image Markdown Added",
-      description: "Replace the URL with your actual image URL",
-    });
+    const file = files[0];
+    setUploadingImage(true);
+    
+    try {
+      const imageUrl = await uploadImage(file, `pages/${page.slug}`);
+      
+      if (imageUrl) {
+        const imageMarkdown = `![${file.name}](${imageUrl})`;
+        
+        // Insert at cursor position if possible, otherwise append
+        const textarea = document.getElementById('content') as HTMLTextAreaElement;
+        if (textarea.selectionStart || textarea.selectionStart === 0) {
+          const startPos = textarea.selectionStart;
+          const endPos = textarea.selectionEnd;
+          const newContent = 
+            content.substring(0, startPos) + 
+            imageMarkdown + 
+            content.substring(endPos, content.length);
+          
+          setContent(newContent);
+          
+          // Reset cursor position after state update
+          setTimeout(() => {
+            textarea.selectionStart = startPos + imageMarkdown.length;
+            textarea.selectionEnd = startPos + imageMarkdown.length;
+            textarea.focus();
+          }, 0);
+        } else {
+          // If no cursor position, append to end
+          setContent(prevContent => prevContent + "\n\n" + imageMarkdown);
+        }
+        
+        toast({
+          title: "Image Uploaded",
+          description: "Image has been uploaded and inserted into the content.",
+        });
+      }
+    } catch (error: any) {
+      console.error("Error uploading image:", error);
+      toast({
+        title: "Upload Failed",
+        description: error.message || "Could not upload image",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingImage(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""; // Reset the input
+      }
+    }
+  };
+  
+  // Helper for markdown syntax insertion
+  const insertMarkdown = (syntax: string, placeholder: string) => {
+    const textarea = document.getElementById('content') as HTMLTextAreaElement;
+    
+    if (textarea.selectionStart || textarea.selectionStart === 0) {
+      const startPos = textarea.selectionStart;
+      const endPos = textarea.selectionEnd;
+      const selectedText = content.substring(startPos, endPos);
+      
+      let insertion = '';
+      if (selectedText) {
+        // If text is selected, wrap it with the syntax
+        insertion = syntax.replace(placeholder, selectedText);
+      } else {
+        // Otherwise just insert the syntax with placeholder
+        insertion = syntax;
+      }
+      
+      const newContent = 
+        content.substring(0, startPos) + 
+        insertion + 
+        content.substring(endPos, content.length);
+      
+      setContent(newContent);
+      
+      // Reset cursor position after state update
+      setTimeout(() => {
+        const newCursorPos = startPos + insertion.length;
+        textarea.selectionStart = newCursorPos;
+        textarea.selectionEnd = newCursorPos;
+        textarea.focus();
+      }, 0);
+    } else {
+      // If no cursor position, append to end
+      setContent(prevContent => prevContent + "\n\n" + syntax);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,18 +156,27 @@ const PageForm: React.FC<PageFormProps> = ({ page }) => {
           <Button
             type="button"
             variant="outline"
-            onClick={insertImageMarkdown}
-            title="Insert Image Markdown"
+            onClick={() => navigate("/admin")}
           >
-            <ImageIcon className="h-4 w-4 mr-2" />
-            Insert Image
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
           </Button>
           <Button
             type="button"
             variant="outline"
             onClick={() => setPreviewMode(!previewMode)}
           >
-            {previewMode ? "Edit Mode" : "Preview Mode"}
+            {previewMode ? (
+              <>
+                <Code className="h-4 w-4 mr-2" />
+                Edit Mode
+              </>
+            ) : (
+              <>
+                <Eye className="h-4 w-4 mr-2" />
+                Preview Mode
+              </>
+            )}
           </Button>
         </div>
       </div>
@@ -106,8 +200,80 @@ const PageForm: React.FC<PageFormProps> = ({ page }) => {
             <CardHeader>
               <CardTitle>{page.title} Content</CardTitle>
               <p className="text-sm text-dm-gray500">
-                Use Markdown for formatting. To add images, use: ![Alt text](image-url.jpg)
+                Use Markdown for formatting.
               </p>
+              <div className="flex flex-wrap gap-2 mt-2">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => insertMarkdown("# Heading", "Heading")}
+                >
+                  H1
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => insertMarkdown("## Subheading", "Subheading")}
+                >
+                  H2
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => insertMarkdown("**Bold text**", "Bold text")}
+                >
+                  Bold
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => insertMarkdown("*Italic text*", "Italic text")}
+                >
+                  Italic
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => insertMarkdown("[Link text](https://example.com)", "Link text")}
+                >
+                  Link
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    if (fileInputRef.current) {
+                      fileInputRef.current.click();
+                    }
+                  }}
+                  disabled={uploadingImage}
+                >
+                  {uploadingImage ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <ImageIcon className="h-4 w-4 mr-2" />
+                      Upload Image
+                    </>
+                  )}
+                </Button>
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  onChange={handleImageUpload} 
+                  accept="image/*" 
+                  className="hidden"
+                />
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -123,14 +289,7 @@ const PageForm: React.FC<PageFormProps> = ({ page }) => {
                 />
               </div>
             </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => navigate("/admin")}
-              >
-                Cancel
-              </Button>
+            <CardFooter className="flex justify-end">
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
@@ -138,7 +297,10 @@ const PageForm: React.FC<PageFormProps> = ({ page }) => {
                     Saving...
                   </>
                 ) : (
-                  "Update Page"
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Save Changes
+                  </>
                 )}
               </Button>
             </CardFooter>

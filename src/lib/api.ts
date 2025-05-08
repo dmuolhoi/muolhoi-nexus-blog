@@ -94,9 +94,25 @@ export async function getPageBySlug(slug: string): Promise<Page | null> {
     .from('pages')
     .select('*')
     .eq('slug', slug)
-    .single();
+    .maybeSingle();
 
   if (error && error.code !== 'PGRST116') throw error;
+  return data;
+}
+
+export async function createPage(page: Omit<Page, 'id' | 'updated_at'>): Promise<Page> {
+  const { data, error } = await supabase
+    .from('pages')
+    .insert([
+      { 
+        ...page, 
+        updated_at: new Date().toISOString() 
+      }
+    ])
+    .select()
+    .single();
+
+  if (error) throw error;
   return data;
 }
 
@@ -113,6 +129,24 @@ export async function updatePage(id: string, page: Partial<Page>): Promise<Page>
 
   if (error) throw error;
   return data;
+}
+
+export async function getOrCreatePage(slug: string, title: string): Promise<Page> {
+  // Try to get the page first
+  const page = await getPageBySlug(slug);
+  
+  // If page exists, return it
+  if (page) return page;
+  
+  // If not, create it with default content
+  const defaultContent = `# ${title}\n\nThis page is under construction.`;
+  const newPage = await createPage({
+    slug,
+    title,
+    content: defaultContent
+  });
+  
+  return newPage;
 }
 
 // Upload an image to Supabase Storage

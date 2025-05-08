@@ -16,6 +16,17 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Define core pages that should always be available for editing
+  const corePages = [
+    { slug: 'home', title: 'Home' },
+    { slug: 'about', title: 'About' },
+    { slug: 'services', title: 'Services' },
+    { slug: 'faq', title: 'FAQ' },
+    { slug: 'resources', title: 'Resources' },
+    { slug: 'privacy', title: 'Privacy Policy' },
+    { slug: 'terms', title: 'Terms of Service' }
+  ];
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -25,7 +36,27 @@ const AdminDashboard = () => {
         ]);
         
         setPosts(postsData);
-        setPages(pagesData);
+        
+        // Combine database pages with core pages that might not exist yet
+        const existingSlugs = new Set(pagesData.map(page => page.slug));
+        const allPages = [...pagesData];
+        
+        // Add core pages that don't exist in the database yet
+        corePages.forEach(corePage => {
+          if (!existingSlugs.has(corePage.slug)) {
+            allPages.push({
+              id: `temp-${corePage.slug}`,
+              slug: corePage.slug,
+              title: corePage.title,
+              content: `# ${corePage.title}\n\nThis page is under construction.`,
+              updated_at: new Date().toISOString()
+            });
+          }
+        });
+        
+        // Sort by title
+        allPages.sort((a, b) => a.title.localeCompare(b.title));
+        setPages(allPages);
       } catch (err: any) {
         setError(err.message || "Failed to fetch data");
         console.error("Error fetching admin data:", err);
@@ -94,7 +125,7 @@ const AdminDashboard = () => {
             {pages.map((page) => (
               <Link
                 key={page.id}
-                to={`/admin/pages/edit/${page.id}`}
+                to={`/admin/pages/edit/${page.slug}`}
                 className="border border-dm-gray200 rounded-lg p-4 hover:shadow-sm transition-shadow"
               >
                 <div className="flex justify-between items-center">

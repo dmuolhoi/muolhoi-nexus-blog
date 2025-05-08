@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { getPageBySlug } from "@/lib/api";
+import { getOrCreatePage } from "@/lib/api";
 import { Page } from "@/lib/supabase";
 import PageForm from "@/components/admin/PageForm";
 import { Loader2 } from "lucide-react";
@@ -22,20 +22,16 @@ const EditPagePage = () => {
       
       try {
         console.log("Fetching page with slug:", id);
-        const data = await getPageBySlug(id);
         
-        if (!data) {
-          setError("Page not found");
-          console.error("Page not found:", id);
-          toast({
-            title: "Error",
-            description: `Page with slug "${id}" not found`,
-            variant: "destructive",
-          });
-        } else {
-          setPage(data);
-          console.log("Page fetched successfully:", data);
-        }
+        // Convert slug to title format for page creation if needed
+        const title = id
+          .split('-')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+        
+        const data = await getOrCreatePage(id, title);
+        setPage(data);
+        console.log("Page fetched or created successfully:", data);
       } catch (err: any) {
         setError(err.message || "Failed to fetch page");
         console.error("Error fetching page:", err);
@@ -71,7 +67,7 @@ const EditPagePage = () => {
         <p className="text-dm-gray700 mb-4">
           {error || "This page could not be found."}
         </p>
-        <p className="text-dm-gray600 text-sm">
+        <p className="text-sm text-dm-gray600">
           Please check the page slug and try again.
         </p>
       </div>

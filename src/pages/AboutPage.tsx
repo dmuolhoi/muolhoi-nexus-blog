@@ -1,11 +1,34 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ExternalLink } from "lucide-react";
+import { getPageBySlug } from "@/lib/api";
+import { Page } from "@/lib/supabase";
+import MarkdownContent from "@/components/blog/MarkdownContent";
+import { Loader2 } from "lucide-react";
 
 const AboutPage = () => {
-  return (
-    <div className="space-y-8 animate-fade-in">
+  const [page, setPage] = useState<Page | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPage = async () => {
+      try {
+        const data = await getPageBySlug("about");
+        setPage(data);
+      } catch (err) {
+        console.error("Error fetching about page:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPage();
+  }, []);
+
+  // Default content that shows while loading or if no custom content is set
+  const defaultContent = (
+    <>
       <section className="space-y-4">
         <h1 className="text-4xl font-bold gradient-text">About Me</h1>
         <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-dm-primary/20 to-dm-secondary/20 p-6 shadow-card">
@@ -133,6 +156,24 @@ const AboutPage = () => {
           </a>
         </div>
       </section>
+    </>
+  );
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-dm-gray500" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8 animate-fade-in">
+      {page && page.content ? (
+        <MarkdownContent content={page.content} />
+      ) : (
+        defaultContent
+      )}
     </div>
   );
 };
